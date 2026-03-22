@@ -21,7 +21,9 @@ function createInitialState() {
 }
 
 export const useAssistantStore = defineStore('assistant', {
-  state: () => createInitialState(),
+  state: () => {
+    return createInitialState()
+  },
 
   getters: {
     // 结果区顶部展示的“结果字数”来自这里。

@@ -116,7 +116,7 @@ export function getTaskPlaceholder(task) {
     copywriting: '输入主题、卖点、背景信息或草稿，让 AI 生成创意文案。'
   }
 
-  return placeholderMap[task] ?? '请输入文本内容'
+  return placeholderMap[task] 
 }
 
 // 根据任务类型返回输入区标题。
@@ -128,5 +128,5 @@ export function getTaskInputLabel(task) {
     copywriting: '主题 / 素材 / 要求'
   }
 
-  return labelMap[task] ?? '输入文本'
+  return labelMap[task]
 }

@@ -7,9 +7,6 @@
       </div>
 
       <div class="panel-actions">
-        <el-button :disabled="!store.resultText" text @click="copyResult">
-          一键复制
-        </el-button>
         <el-button :disabled="store.loading" text @click="$emit('regenerate')">
           重新生成
         </el-button>
@@ -39,30 +36,21 @@
       <el-icon size="28">
         <Document />
       </el-icon>
-      <p>生成结果会显示在这里，支持一键复制。</p>
+      <p>生成结果会显示在这里</p>
     </div>
   </section>
 </template>
 
 <script setup>
-import { ElMessage } from 'element-plus'
+
 import { useAssistantStore } from '@/stores/assistant'
-import { copyText } from '@/utils/clipboard'
+
 
 defineEmits(['regenerate'])
 
 const store = useAssistantStore()
 
-async function copyResult() {
-  const copied = await copyText(store.resultText)
 
-  if (copied) {
-    ElMessage.success('结果已复制到剪贴板。')
-    return
-  }
-
-  ElMessage.error('复制失败，请稍后重试。')
-}
 </script>
 
 <style scoped>

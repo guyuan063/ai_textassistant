@@ -38,43 +38,6 @@ export const DEEPSEEK_MODEL_OPTIONS = [
   { label: 'deepseek-reasoner', value: 'deepseek-reasoner' }
 ]
 
-export const DEFAULT_TEMPLATES = [
-  {
-    id: 'tpl-polish-resume',
-    title: '简历润色',
-    task: 'polish',
-    content:
-      '请帮我润色这段自我介绍，让表达更专业自然：我做了三年运营，负责内容策划、数据分析和活动执行，做过多个增长项目。',
-    createdAt: '2026-03-21T00:00:00.000Z'
-  },
-  {
-    id: 'tpl-translate-mail',
-    title: '邮件翻译',
-    task: 'translate',
-    content:
-      '您好，附件是本周项目进度汇总。如需我补充细节，请随时联系。谢谢！',
-    createdAt: '2026-03-21T00:00:00.000Z'
-  },
-  {
-    id: 'tpl-summary-report',
-    title: '会议纪要摘要',
-    task: 'summary',
-    content:
-      '请总结以下会议纪要：本周产品迭代重点包括首页改版、会员支付流程优化、客服知识库补充。设计稿将在周三完成，前端联调安排在周四，预计周五灰度上线。',
-    createdAt: '2026-03-21T00:00:00.000Z'
-  },
-  {
-    id: 'tpl-copy-interview',
-    title: '面试自我介绍',
-    task: 'copywriting',
-    content:
-      '请根据以下信息生成一段 1 分钟的面试自我介绍：3 年新媒体运营经验，擅长内容策划、数据复盘、跨部门协作，希望应聘互联网教育公司的增长运营岗位。',
-    createdAt: '2026-03-21T00:00:00.000Z'
-  }
-]
-
-export const HISTORY_LIMIT = 20
-
 export function createDefaultSettings() {
   return {
     provider: 'openai',
@@ -127,18 +90,8 @@ export function createDefaultForms() {
   }
 }
 
-export function cloneTemplates() {
-  return DEFAULT_TEMPLATES.map((item) => ({ ...item }))
-}
-
 export function getTaskLabel(task) {
   return TASK_TABS.find((item) => item.key === task)?.label ?? '文本处理'
-}
-
-export function getProviderLabel(provider) {
-  return (
-    PROVIDER_OPTIONS.find((item) => item.value === provider)?.label ?? '未知模型'
-  )
 }
 
 export function getTaskPlaceholder(task) {

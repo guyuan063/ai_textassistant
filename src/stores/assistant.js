@@ -1,10 +1,5 @@
 import { defineStore } from 'pinia'
-import {
-  HISTORY_LIMIT,
-  cloneTemplates,
-  createDefaultForms,
-  createDefaultSettings
-} from '@/config/assistant'
+import { createDefaultForms, createDefaultSettings } from '@/config/assistant'
 import {
   buildPersistedPayload,
   loadPersistedState,
@@ -19,25 +14,13 @@ function createInitialState() {
     loading: false,
     errorMessage: '',
     settings: createDefaultSettings(),
-    forms: createDefaultForms(),
-    templates: cloneTemplates(),
-    history: []
+    forms: createDefaultForms()
   }
-}
-
-function createId(prefix) {
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-    return `${prefix}-${crypto.randomUUID()}`
-  }
-
-  return `${prefix}-${Date.now()}`
 }
 
 export const useAssistantStore = defineStore('assistant', {
   state: () => createInitialState(),
   getters: {
-    historyCount: (state) => state.history.length,
-    templateCount: (state) => state.templates.length,
     resultLength: (state) => state.resultText.trim().length
   },
   actions: {
@@ -86,11 +69,6 @@ export const useAssistantStore = defineStore('assistant', {
           ...(persisted.forms?.copywriting || {})
         }
       }
-      this.templates =
-        persisted.templates?.length > 0
-          ? persisted.templates
-          : cloneTemplates()
-      this.history = Array.isArray(persisted.history) ? persisted.history : []
     },
     persistState(state = this.$state) {
       savePersistedState(buildPersistedPayload(state))
@@ -113,50 +91,6 @@ export const useAssistantStore = defineStore('assistant', {
     },
     stopLoading() {
       this.loading = false
-    },
-    saveTemplate({ title, content, task }) {
-      const template = {
-        id: createId('tpl'),
-        title,
-        content,
-        task,
-        createdAt: new Date().toISOString()
-      }
-
-      this.templates = [template, ...this.templates]
-    },
-    removeTemplate(id) {
-      this.templates = this.templates.filter((item) => item.id !== id)
-    },
-    applyTemplate(template) {
-      this.activeTask = template.task
-      this.inputText = template.content
-      this.resultText = ''
-      this.errorMessage = ''
-    },
-    resetTemplates() {
-      this.templates = cloneTemplates()
-    },
-    pushHistory({ task, inputText, resultText, provider }) {
-      const record = {
-        id: createId('history'),
-        task,
-        inputText,
-        resultText,
-        provider,
-        createdAt: new Date().toISOString()
-      }
-
-      this.history = [record, ...this.history].slice(0, HISTORY_LIMIT)
-    },
-    applyHistory(record) {
-      this.activeTask = record.task
-      this.inputText = record.inputText
-      this.resultText = record.resultText
-      this.errorMessage = ''
-    },
-    clearHistory() {
-      this.history = []
     }
   }
 })

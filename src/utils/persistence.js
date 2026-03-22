@@ -23,8 +23,6 @@ export function buildPersistedPayload(state) {
     activeTask: state.activeTask,
     inputText: state.inputText,
     settings: state.settings,
-    forms: state.forms,
-    templates: state.templates,
-    history: state.history
+    forms: state.forms
   }
 }

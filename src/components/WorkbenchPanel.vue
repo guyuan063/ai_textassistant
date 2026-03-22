@@ -1,17 +1,5 @@
-﻿<template>
+<template>
   <section class="panel">
-    <div class="panel-head">
-      <div>
-        <p class="section-kicker">工作区</p>
-        <h2>选择任务并输入内容</h2>
-      </div>
-
-      <div class="panel-actions">
-        <el-button text @click="saveAsTemplate">保存为模板</el-button>
-        <el-button text @click="store.clearWorkspace">清空</el-button>
-      </div>
-    </div>
-
     <el-tabs v-model="store.activeTask" class="task-tabs">
       <el-tab-pane
         v-for="item in TASK_TABS"
@@ -44,7 +32,7 @@
         <template v-else-if="item.key === 'translate'">
           <div class="control-grid">
             <div class="control-item">
-              <span>源语言</span>
+              <span>原语言</span>
               <el-select v-model="store.forms.translate.sourceLanguage">
                 <el-option
                   v-for="language in LANGUAGE_OPTIONS"
@@ -158,10 +146,6 @@
     </div>
 
     <div class="submit-row">
-      <div class="prompt-tip">
-        小提示：创意文案模块可以直接输入“主题 + 受众 + 卖点”，不需要先写完整草稿。
-      </div>
-
       <el-button
         :loading="store.loading"
         class="generate-btn"
@@ -177,7 +161,6 @@
 
 <script setup>
 import { computed } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   COPYWRITING_TYPES,
   LANGUAGE_OPTIONS,
@@ -198,53 +181,12 @@ const currentPlaceholder = computed(() => getTaskPlaceholder(store.activeTask))
 const targetLanguageOptions = computed(() =>
   LANGUAGE_OPTIONS.filter((lang) => lang !== '自动识别')
 )
-
-async function saveAsTemplate() {
-  if (!store.inputText.trim()) {
-    ElMessage.warning('当前没有可保存的输入内容。')
-    return
-  }
-
-  try {
-    const { value } = await ElMessageBox.prompt(
-      '给这个模板起个名字，后续可以一键复用。',
-      '保存模板',
-      {
-        confirmButtonText: '保存',
-        cancelButtonText: '取消',
-        inputPlaceholder: '例如：客户邮件润色 / 小红书爆款标题'
-      }
-    )
-
-    store.saveTemplate({
-      title: value,
-      content: store.inputText,
-      task: store.activeTask
-    })
-    ElMessage.success('模板已保存到本地。')
-  } catch {
-    // 用户取消时不需要额外处理
-  }
-}
 </script>
 
 <style scoped>
-.panel-head {
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 18px;
-}
 
-.panel-head h2 {
-  font-size: 1.4rem;
-  margin: 4px 0 0;
-}
 
-.panel-actions {
-  display: flex;
-  gap: 8px;
-}
+
 
 .task-tabs :deep(.el-tabs__header) {
   margin-bottom: 18px;
@@ -297,18 +239,14 @@ async function saveAsTemplate() {
   margin-top: 18px;
 }
 
-.prompt-tip {
-  color: var(--muted);
-  line-height: 1.6;
-  max-width: 70%;
-}
+
 
 .generate-btn {
   min-width: 144px;
 }
 
 @media (max-width: 900px) {
-  .panel-head,
+  
   .submit-row {
     align-items: flex-start;
     flex-direction: column;
@@ -318,8 +256,6 @@ async function saveAsTemplate() {
     grid-template-columns: 1fr;
   }
 
-  .prompt-tip {
-    max-width: none;
-  }
+
 }
 </style>

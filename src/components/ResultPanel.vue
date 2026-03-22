@@ -1,4 +1,5 @@
-﻿<template>
+<template>
+  <!-- 结果区负责展示 4 种状态：默认、加载中、成功结果、错误信息 -->
   <section class="panel result-panel">
     <div class="panel-head">
       <div>
@@ -7,12 +8,14 @@
       </div>
 
       <div class="panel-actions">
+        <!-- 重新生成本质上还是复用父组件的 handleGenerate -->
         <el-button :disabled="store.loading" text @click="$emit('regenerate')">
           重新生成
         </el-button>
       </div>
     </div>
 
+    <!-- 如果接口失败，就优先展示错误 -->
     <el-alert
       v-if="store.errorMessage"
       :closable="false"
@@ -21,6 +24,7 @@
       type="error"
     />
 
+    <!-- 加载中状态 -->
     <div v-if="store.loading" class="result-state loading-state">
       <el-icon class="is-loading" size="26">
         <Loading />
@@ -28,10 +32,13 @@
       <p>AI 正在整理文本，请稍候...</p>
     </div>
 
+    <!-- 正常结果展示 -->
     <div v-else-if="store.resultText" class="result-content">
+      <!-- pre + white-space: pre-wrap 可以保留换行，同时让文本自动换行 -->
       <pre>{{ store.resultText }}</pre>
     </div>
 
+    <!-- 默认空状态 -->
     <div v-else class="result-state empty-state">
       <el-icon size="28">
         <Document />
@@ -42,15 +49,12 @@
 </template>
 
 <script setup>
-
 import { useAssistantStore } from '@/stores/assistant'
 
-
+// 结果区不处理请求逻辑，只负责发出“重新生成”事件。
 defineEmits(['regenerate'])
 
 const store = useAssistantStore()
-
-
 </script>
 
 <style scoped>
@@ -75,6 +79,7 @@ const store = useAssistantStore()
   margin-bottom: 18px;
 }
 
+/* 成功结果区的白底内容容器 */
 .result-content {
   background: rgba(255, 255, 255, 0.82);
   border: 1px solid rgba(27, 38, 59, 0.08);
@@ -93,6 +98,7 @@ const store = useAssistantStore()
   word-break: break-word;
 }
 
+/* 空状态和加载状态共用基础布局 */
 .result-state {
   align-items: center;
   border: 1px dashed rgba(27, 38, 59, 0.12);

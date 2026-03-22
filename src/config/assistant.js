@@ -1,3 +1,5 @@
+// 顶部任务标签配置。
+// key 是程序内部使用的标识，label / shortLabel 是界面上展示的文案。
 export const TASK_TABS = [
   { key: 'polish', label: '润色', shortLabel: '润色' },
   { key: 'translate', label: '翻译', shortLabel: '翻译' },
@@ -5,12 +7,14 @@ export const TASK_TABS = [
   { key: 'copywriting', label: '文案', shortLabel: '文案' }
 ]
 
+// 右侧模型下拉框的候选项。
 export const PROVIDER_OPTIONS = [
   { label: 'OpenAI', value: 'openai' },
   { label: 'DeepSeek', value: 'deepseek' },
   { label: '百度千帆 / 文心', value: 'baidu' }
 ]
 
+// 翻译模块使用的语言选项。
 export const LANGUAGE_OPTIONS = [
   '自动识别',
   '中文',
@@ -22,9 +26,11 @@ export const LANGUAGE_OPTIONS = [
   '西班牙文'
 ]
 
+// 摘要模块的长度和格式选项。
 export const SUMMARY_LENGTH_OPTIONS = ['精简版', '标准版', '详细版']
 export const SUMMARY_FORMAT_OPTIONS = ['自然段', '要点列表']
 
+// 文案模块的预设类型。
 export const COPYWRITING_TYPES = [
   '朋友圈文案',
   '小红书标题',
@@ -33,11 +39,15 @@ export const COPYWRITING_TYPES = [
   '面试自我介绍'
 ]
 
+// DeepSeek 内置的常用模型选项。
+// 如果后续要扩展更多模型，只需要继续往这里加即可。
 export const DEEPSEEK_MODEL_OPTIONS = [
   { label: 'deepseek-chat', value: 'deepseek-chat' },
   { label: 'deepseek-reasoner', value: 'deepseek-reasoner' }
 ]
 
+// 创建模型配置的默认值。
+// 单独写成函数而不是常量对象，是为了避免多个地方共享同一份引用。
 export function createDefaultSettings() {
   return {
     provider: 'openai',
@@ -64,6 +74,8 @@ export function createDefaultSettings() {
   }
 }
 
+// 创建各个任务表单的默认值。
+// 这些值会直接驱动工作区表单的初始显示。
 export function createDefaultForms() {
   return {
     polish: {
@@ -90,10 +102,12 @@ export function createDefaultForms() {
   }
 }
 
+// 根据任务 key 反查界面上的任务名称。
 export function getTaskLabel(task) {
   return TASK_TABS.find((item) => item.key === task)?.label ?? '文本处理'
 }
 
+// 根据任务类型返回输入框 placeholder。
 export function getTaskPlaceholder(task) {
   const placeholderMap = {
     polish: '输入需要润色或纠错的原文，例如工作总结、邮件、自我介绍等。',
@@ -105,6 +119,7 @@ export function getTaskPlaceholder(task) {
   return placeholderMap[task] ?? '请输入文本内容'
 }
 
+// 根据任务类型返回输入区标题。
 export function getTaskInputLabel(task) {
   const labelMap = {
     polish: '原始文本',

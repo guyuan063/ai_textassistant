@@ -1,3 +1,5 @@
+// 把接口返回的不同文本结构统一转成普通字符串。
+// 有些模型直接返回 string，有些会返回数组结构，所以这里先做兼容。
 function normalizeTextContent(content) {
   if (typeof content === 'string') {
     return content.trim()
@@ -13,6 +15,8 @@ function normalizeTextContent(content) {
   return ''
 }
 
+// OpenAI 兼容接口通常把最终内容放在 message.content 里。
+// DeepSeek 的部分模型还可能返回 reasoning_content，所以这里一起兜底。
 function extractCompatibleMessageText(message) {
   return (
     normalizeTextContent(message?.content) ||
@@ -20,6 +24,8 @@ function extractCompatibleMessageText(message) {
   )
 }
 
+// 根据当前任务类型，把“用户输入 + 表单配置”组合成最终 Prompt。
+// 这样页面层只负责收集数据，具体怎么组织成 AI 指令交给服务层处理。
 function buildTaskPrompts({ task, inputText, forms }) {
   const promptMap = {
     polish() {
@@ -42,6 +48,7 @@ function buildTaskPrompts({ task, inputText, forms }) {
           .join('\n')
       }
     },
+
     translate() {
       return {
         system:
@@ -57,6 +64,7 @@ function buildTaskPrompts({ task, inputText, forms }) {
         ].join('\n')
       }
     },
+
     summary() {
       return {
         system:
@@ -72,6 +80,7 @@ function buildTaskPrompts({ task, inputText, forms }) {
         ].join('\n')
       }
     },
+
     copywriting() {
       return {
         system:
@@ -94,9 +103,14 @@ function buildTaskPrompts({ task, inputText, forms }) {
     }
   }
 
+  // 如果 task 没匹配到，默认回退到润色逻辑，避免出现 undefined。
   return promptMap[task]?.() ?? promptMap.polish()
 }
 
+// 用户在设置面板里填的 Base URL 有时可能是：
+// 1. https://api.xxx.com/v1
+// 2. https://api.xxx.com/v1/chat/completions
+// 这里统一补全成最终真正请求的地址。
 function buildCompatibleEndpoint(baseUrl) {
   const trimmed = (baseUrl || '').trim().replace(/\/+$/, '')
 
@@ -109,6 +123,8 @@ function buildCompatibleEndpoint(baseUrl) {
     : `${trimmed}/chat/completions`
 }
 
+// OpenAI / DeepSeek 这类兼容接口的请求体结构非常接近，
+// 所以这里抽成一个通用 payload 构造器。
 function buildCompatiblePayload({ settings, systemPrompt, userPrompt }) {
   const payload = {
     model: settings.model,
@@ -124,7 +140,8 @@ function buildCompatiblePayload({ settings, systemPrompt, userPrompt }) {
     ]
   }
 
-  // DeepSeek reasoner uses a fixed internal reasoning setup, so temperature is omitted.
+  // deepseek-reasoner 的推理策略由模型内部控制，
+  // 通常不建议再额外传 temperature，所以这里显式跳过。
   if (settings.model !== 'deepseek-reasoner') {
     payload.temperature = settings.temperature
   }
@@ -132,6 +149,7 @@ function buildCompatiblePayload({ settings, systemPrompt, userPrompt }) {
   return payload
 }
 
+// 处理 OpenAI / DeepSeek 这类“兼容 chat/completions”的提供商。
 async function requestCompatibleProvider({
   axios,
   providerLabel,
@@ -167,6 +185,8 @@ async function requestCompatibleProvider({
   return text
 }
 
+// 百度千帆和 OpenAI 兼容接口不一样：
+// 它需要先用 API Key / Secret Key 换 access_token，再发聊天请求。
 async function requestBaidu({ axios, settings, systemPrompt, userPrompt }) {
   const tokenResponse = await axios.post(settings.tokenUrl, null, {
     params: {
@@ -214,6 +234,8 @@ async function requestBaidu({ axios, settings, systemPrompt, userPrompt }) {
   return text
 }
 
+// 对外暴露的统一入口。
+// 页面层只需要把 task / forms / settings 传进来，不用关心底层细节。
 export async function generateText({ task, inputText, forms, settings, axios }) {
   const { default: defaultAxios } = await import('axios')
   const http = axios || defaultAxios
@@ -259,6 +281,8 @@ export async function generateText({ task, inputText, forms, settings, axios }) 
   })
 }
 
+// 不同接口的报错字段不统一，这里做一次归一化。
+// 页面层只拿到最终字符串，不需要自己判断各种 error 结构。
 export function formatRequestError(error) {
   const responseMessage =
     error.response?.data?.error?.message ||

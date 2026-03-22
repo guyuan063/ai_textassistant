@@ -1,5 +1,7 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@600;700&display=swap');
+/* 全局字体：标题使用衬线，正文使用无衬线 */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@600;700&display=swap');
 
+/* 全局设计变量，后续改主题色时主要改这里 */
 :root {
   --bg: #ffffff;
   --ink: #1b263b;
@@ -8,10 +10,12 @@
   --accent-dark: #337ecc;
 }
 
+/* 统一使用 border-box，避免元素尺寸计算混乱 */
 * {
   box-sizing: border-box;
 }
 
+/* 让页面至少撑满一屏，并去掉浏览器默认外边距 */
 html,
 body,
 #app {
@@ -19,12 +23,14 @@ body,
   min-height: 100%;
 }
 
+/* 整个页面的基础字体、背景和文字颜色 */
 body {
   background: #ffffff;
   color: var(--ink);
   font-family: 'Manrope', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
+/* 让表单控件和按钮继承页面字体，而不是浏览器默认字体 */
 button,
 input,
 textarea,
@@ -32,12 +38,14 @@ select {
   font: inherit;
 }
 
+/* 页面主体宽度限制 */
 .page-shell {
   margin: 0 auto;
   max-width: 1480px;
   padding: 28px;
 }
 
+/* 现在这两个光晕被关闭，仅保留结构，便于以后想恢复视觉效果时继续使用 */
 .glow {
   display: none;
 }
@@ -48,6 +56,7 @@ select {
   z-index: 1;
 }
 
+/* 所有白色卡片的基础样式 */
 .panel {
   background: #fff;
   border: 1px solid #e5e7eb;
@@ -58,6 +67,7 @@ select {
   margin-bottom: 24px;
 }
 
+/* 首页大标题 */
 .hero-copy h1 {
   font-family: 'Noto Serif SC', 'Songti SC', serif;
   font-size: clamp(2rem, 4vw, 3.6rem);
@@ -65,6 +75,7 @@ select {
   margin: 10px 0 12px;
 }
 
+/* 首页副标题 */
 .hero-description {
   color: var(--muted);
   font-size: 1rem;
@@ -73,6 +84,7 @@ select {
   max-width: 760px;
 }
 
+/* 主内容区使用两列布局：左宽右窄 */
 .dashboard {
   display: grid;
   gap: 24px;
@@ -86,6 +98,7 @@ select {
   gap: 24px;
 }
 
+/* 平板及以下改成单列布局 */
 @media (max-width: 1120px) {
   .hero-panel,
   .dashboard {
@@ -93,6 +106,7 @@ select {
   }
 }
 
+/* 手机端缩小留白，避免内容太挤 */
 @media (max-width: 720px) {
   .page-shell {
     padding: 16px;

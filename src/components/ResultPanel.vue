@@ -2,40 +2,30 @@
   <!-- 结果区负责展示 4 种状态：默认、加载中、成功结果、错误信息 -->
   <section class="panel result-panel">
     <div class="panel-head">
-      <div>
-        <p class="section-kicker">结果区</p>
-        <h2>AI 输出内容</h2>
-      </div>
-
+      <h2>AI 输出内容</h2>
       <div class="panel-actions">
         <!-- 重新生成本质上还是复用父组件的 handleGenerate -->
-        <el-button :disabled="store.loading" text @click="$emit('regenerate')">
+        <el-button :disabled="store.loading"  @click="$emit('regenerate')">
           重新生成
         </el-button>
       </div>
     </div>
 
     <!-- 如果接口失败，就优先展示错误 -->
-    <el-alert
-      v-if="store.errorMessage"
-      :closable="false"
-      :title="store.errorMessage"
-      class="result-alert"
-      type="error"
-    />
+    <el-alert v-if="store.errorMessage" :closable="false" :title="store.errorMessage" class="result-alert"
+      type="error" />
 
-    <!-- 加载中状态 -->
-    <div v-if="store.loading" class="result-state loading-state">
+    <!-- 正常结果展示 (流式输出时 loading=true 且 resultText 有值，也要显示) -->
+    <div v-if="store.resultText" class="result-content">
+      <pre>{{ store.resultText }}<span v-if="store.loading" class="cursor">|</span></pre>
+    </div>
+
+    <!-- 加载中状态 (只在还没有任何输出时显示) -->
+    <div v-else-if="store.loading" class="result-state loading-state">
       <el-icon class="is-loading" size="26">
         <Loading />
       </el-icon>
       <p>AI 正在整理文本，请稍候...</p>
-    </div>
-
-    <!-- 正常结果展示 -->
-    <div v-else-if="store.resultText" class="result-content">
-      <!-- pre + white-space: pre-wrap 可以保留换行，同时让文本自动换行 -->
-      <pre>{{ store.resultText }}</pre>
     </div>
 
     <!-- 默认空状态 -->
@@ -96,6 +86,17 @@ const store = useAssistantStore()
   margin: 0;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+.cursor {
+  animation: blink 1s infinite;
+  color: var(--ink);
+  font-weight: bold;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
 }
 
 /* 空状态和加载状态共用基础布局 */

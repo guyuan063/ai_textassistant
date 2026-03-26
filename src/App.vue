@@ -1,10 +1,7 @@
 <template>
   <!-- 页面最外层容器，负责限制内容宽度并承载整体布局 -->
   <div class="page-shell">
-    <!-- 左右两侧的光晕只是装饰，不参与功能逻辑 -->
-    <div class="glow glow-left"></div>
-    <div class="glow glow-right"></div>
-
+  
     <!-- 顶部介绍区：展示项目标题和核心卖点 -->
     <header class="hero-panel panel">
       <div class="hero-copy">
@@ -38,18 +35,15 @@ import WorkbenchPanel from '@/components/WorkbenchPanel.vue'
 import ResultPanel from '@/components/ResultPanel.vue'
 import SidebarPanel from '@/components/SidebarPanel.vue'
 import { useAssistantStore } from '@/stores/assistant'
-import { formatRequestError, generateText } from '@/services/ai'
+import { formatRequestError, generateTextStream } from '@/services/ai'
 
 // 这里拿到的是整个应用共享的 Pinia store。
-// 页面、工作区、结果区、侧边栏都会读写这份状态。
 const store = useAssistantStore()
 
 // 页面加载时先把浏览器里上次保存的内容恢复回来。
-// 这样用户刷新页面后，输入内容和模型设置不会直接丢失。
 store.hydrate()
 
 // 任何和 store 有关的变化都会自动持久化到 localStorage。
-// detached: true 表示这个订阅器独立于组件生命周期，避免组件更新时被意外清理。
 store.$subscribe(
   (_mutation, state) => {
     store.persistState(state)
@@ -57,43 +51,46 @@ store.$subscribe(
   { detached: true }
 )
 
-// 这是整个页面最核心的业务函数：
-// 1. 先校验输入
-// 2. 设置加载状态
-// 3. 调用 AI 接口
-// 4. 成功则写入结果，失败则写入错误信息
+// 这是整个页面最核心的业务函数 (已改造为流式处理)
 async function handleGenerate() {
-  // trim() 用来去掉首尾空格，避免用户只输入空白字符也触发请求。
   if (!store.inputText.trim()) {
     ElMessage.warning('请先输入文本内容或需求')
     return
   }
 
-  // 请求开始前先把 loading 设为 true，界面会进入“生成中”状态。
   store.startLoading()
 
   try {
-    // generateText 会根据当前选择的模型提供商，自动走 OpenAI、DeepSeek 或百度分支。
-    const result = await generateText({
+    await generateTextStream({
       task: store.activeTask,
       inputText: store.inputText,
       forms: store.forms,
-      settings: store.settings
+      settings: store.settings,
+      
+      onMessage: (chunk) => {
+        store.appendResult(chunk)
+      },
+      
+      onError: (errMsg) => {
+        store.setError(errMsg)
+        ElMessage.error(errMsg)
+      }
     })
 
-    // 请求成功后，把 AI 返回的文本写回 store，结果区会自动重新渲染。
-    store.setResult(result)
-    ElMessage.success('生成完成，结果已更新')
+    if (!store.errorMessage && store.resultText) {
+      ElMessage.success('生成完成，结果已更新')
+    }
+
   } catch (error) {
-    // 接口返回的错误结构可能不一致，所以单独封装了格式化函数。
-    // 这里统一把错误转换成可直接展示给用户的字符串。
     const message = formatRequestError(error)
     store.setError(message)
     ElMessage.error(message)
   } finally {
-    // 无论成功还是失败，都要结束 loading。
-    // finally 能保证这一步一定执行。
     store.stopLoading()
   }
 }
 </script>
+
+<style>
+/* 如果你之前有全局样式可以放在这里，没有的话留空即可 */
+</style>

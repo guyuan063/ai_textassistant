@@ -32,10 +32,20 @@ export const useAssistantStore = defineStore('assistant', {
   },
 
   actions: {
-    // 从 localStorage 恢复上一次保存的状态。
-    // 这里采用“默认值 + 持久化值”的合并策略，目的是：
-    // 1. 新增字段时不至于因为旧缓存缺字段而报错
-    // 2. 只覆盖用户真正保存过的部分
+    startLoading() {
+      this.loading = true
+      this.errorMessage = ''
+      this.resultText = ''
+    },
+
+    stopLoading() {
+      this.loading = false
+    },
+
+    appendResult(chunk) {
+      this.resultText += chunk
+    },
+
     hydrate() {
       const persisted = loadPersistedState()
 
@@ -110,17 +120,6 @@ export const useAssistantStore = defineStore('assistant', {
       this.inputText = ''
       this.resultText = ''
       this.errorMessage = ''
-    },
-
-    // 请求开始时进入加载状态，并顺手清除上一次错误。
-    startLoading() {
-      this.loading = true
-      this.errorMessage = ''
-    },
-
-    // 请求结束时关闭加载状态。
-    stopLoading() {
-      this.loading = false
     }
   }
 })

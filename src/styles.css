@@ -38,6 +38,7 @@ select {
   font: inherit;
 }
 
+
 /* 页面主体宽度限制 */
 .page-shell {
   margin: 0 auto;
@@ -45,10 +46,7 @@ select {
   padding: 28px;
 }
 
-/* 现在这两个光晕被关闭，仅保留结构，便于以后想恢复视觉效果时继续使用 */
-.glow {
-  display: none;
-}
+
 
 .hero-panel,
 .dashboard {
@@ -58,7 +56,7 @@ select {
 
 /* 所有白色卡片的基础样式 */
 .panel {
-  background: #fff;
+ border-radius: 8px;
   border: 1px solid #e5e7eb;
   padding: 24px;
 }

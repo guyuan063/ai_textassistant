@@ -4,6 +4,7 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import App from './App.vue'
+import router from './router'
 import './styles.css'
 
 // createApp(App) 表示把根组件 App.vue 作为整个应用的入口。
@@ -14,6 +15,9 @@ app.use(createPinia())
 
 // 注册 Element Plus，后续页面里才能直接使用 <el-button>、<el-input> 这类组件。
 app.use(ElementPlus)
+
+// 注册路由
+app.use(router)
 
 // 把 Element Plus 自带图标批量注册成全局组件。
 // 这样在任意 .vue 文件里都能直接写 <Loading />、<Document />。

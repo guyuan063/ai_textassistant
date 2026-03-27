@@ -2,8 +2,9 @@
 // 后续如果要做版本升级或拆分存储，可以从这里统一调整。
 const STORAGE_KEY = 'ai-textassistant-state'
 
-// 从浏览器读取上次保存的状态。
+// 从浏览器读取上次保存的状态方法
 // try/catch 是为了防止 JSON 格式损坏时页面直接报错。
+//字符串->对象
 export function loadPersistedState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
@@ -11,15 +12,6 @@ export function loadPersistedState() {
   } catch (error) {
     console.warn('读取本地缓存失败', error)
     return null
-  }
-}
-
-// 把状态序列化后写入 localStorage。
-export function savePersistedState(payload) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
-  } catch (error) {
-    console.warn('保存本地缓存失败', error)
   }
 }
 
@@ -33,3 +25,15 @@ export function buildPersistedPayload(state) {
     forms: state.forms
   }
 }
+
+
+// 把状态序列化后写入 localStorage。
+//对象->字符串
+export function savePersistedState(payload) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
+  } catch (error) {
+    console.warn('保存本地缓存失败', error)
+  }
+}
+

@@ -1,7 +1,7 @@
 <template>
   <!-- 页面最外层容器，负责限制内容宽度并承载整体布局 -->
   <div class="page-shell">
-  
+
     <!-- 顶部介绍区：展示项目标题和核心卖点 -->
     <header class="hero-panel panel">
       <div class="hero-copy">
@@ -22,7 +22,7 @@
       </section>
 
       <aside class="side-column">
-        <!-- 侧边栏只保留模型配置，方便面试时讲清主线功能 -->
+       <!-- 模型配置侧边栏 -->
         <SidebarPanel />
       </aside>
     </main>
@@ -51,26 +51,28 @@ store.$subscribe(
   { detached: true }
 )
 
-// 这是整个页面最核心的业务函数 (已改造为流式处理)
+
 async function handleGenerate() {
   if (!store.inputText.trim()) {
     ElMessage.warning('请先输入文本内容或需求')
     return
   }
-
+  // 加载图标
   store.startLoading()
 
   try {
+    //从pinia拿用户数据，调用请求
     await generateTextStream({
       task: store.activeTask,
       inputText: store.inputText,
       forms: store.forms,
       settings: store.settings,
-      
+
       onMessage: (chunk) => {
+        //内容追加
         store.appendResult(chunk)
       },
-      
+
       onError: (errMsg) => {
         store.setError(errMsg)
         ElMessage.error(errMsg)
@@ -86,11 +88,10 @@ async function handleGenerate() {
     store.setError(message)
     ElMessage.error(message)
   } finally {
+    //停止加载状态
     store.stopLoading()
   }
 }
 </script>
 
-<style>
-/* 如果你之前有全局样式可以放在这里，没有的话留空即可 */
-</style>
+<style></style>

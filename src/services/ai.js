@@ -1,7 +1,7 @@
 
-// 保持原有的 Prompt 构建逻辑不变，写得非常好！
 function buildTaskPrompts({ task, inputText, forms }) {
   const promptMap = {
+
     polish() {
       const action = forms.polish.action === 'correct' ? '纠错改错' : '润色优化'
       return {
@@ -17,6 +17,7 @@ function buildTaskPrompts({ task, inputText, forms }) {
         ].filter(Boolean).join('\n')
       }
     },
+
     translate() {
       return {
         system: '你是一名多语言翻译助手，请保证翻译准确、自然，并尽量保留原文语境。',
@@ -31,6 +32,7 @@ function buildTaskPrompts({ task, inputText, forms }) {
         ].join('\n')
       }
     },
+
     summary() {
       return {
         system: '你是一名擅长信息提炼的摘要助手，请压缩冗余信息并保留关键结论。',
@@ -45,6 +47,7 @@ function buildTaskPrompts({ task, inputText, forms }) {
         ].join('\n')
       }
     },
+
     copywriting() {
       return {
         system: '你是一名资深内容策划与文案写作助手，擅长输出高可读性、高完成度的实用文本。',
@@ -64,6 +67,7 @@ function buildTaskPrompts({ task, inputText, forms }) {
   return promptMap[task]?.() ?? promptMap.polish()
 }
 
+// 补全为标准合法的接口地址
 function buildCompatibleEndpoint(baseUrl) {
   const trimmed = (baseUrl || '').trim().replace(/\/+$/, '')
   if (!trimmed) {
@@ -74,6 +78,7 @@ function buildCompatibleEndpoint(baseUrl) {
 
 // 🌟 修改：强制开启 stream: true
 function buildCompatiblePayload({ settings, systemPrompt, userPrompt }) {
+  //构建请求体
   const payload = {
     model: settings.model,
     stream: true, // 开启流式输出
@@ -82,18 +87,16 @@ function buildCompatiblePayload({ settings, systemPrompt, userPrompt }) {
       { role: 'user', content: userPrompt }
     ]
   }
-
+  //deepseek无温度
   if (settings.model !== 'deepseek-reasoner') {
     payload.temperature = settings.temperature
   }
-
   return payload
 }
 
-/**
- * 🌟 核心通用：解析 SSE 流式数据
- * 将 fetch 的网络流转为回调函数触发
- */
+
+
+//流式输出函数，解析 SSE 流式数据，读取，解码，缓冲
 async function processSSEStream(response, onMessage, onFinish, parser) {
   const reader = response.body.getReader()
   const decoder = new TextDecoder('utf-8')
@@ -104,16 +107,19 @@ async function processSSEStream(response, onMessage, onFinish, parser) {
       const { done, value } = await reader.read()
       if (done) break
 
+      // 解决数据截断问题,拼接
       buffer += decoder.decode(value, { stream: true })
       const lines = buffer.split('\n')
-      buffer = lines.pop() // 保留最后一行不完整的字符串
+      // 保留最后一行不完整的字符串
+      buffer = lines.pop()
 
+
+      //整理数据格式，判断去除空格和data字符
       for (const line of lines) {
         const trimmedLine = line.trim()
         if (!trimmedLine || !trimmedLine.startsWith('data: ')) continue
-        
         const dataStr = trimmedLine.replace(/^data:\s*/, '')
-        
+
         // OpenAI 标准结束符
         if (dataStr === '[DONE]') {
           continue
@@ -121,9 +127,10 @@ async function processSSEStream(response, onMessage, onFinish, parser) {
 
         try {
           const data = JSON.parse(dataStr)
-          // parser 是外部传入的提取逻辑，因为百度和OpenAI的JSON结构不同
+          //  转为对象
           const content = parser(data)
           if (content) {
+            //将流式输出内容赋值追加
             onMessage(content)
           }
         } catch (e) {
@@ -134,10 +141,14 @@ async function processSSEStream(response, onMessage, onFinish, parser) {
     }
   } finally {
     reader.releaseLock()
-    if (onFinish) onFinish()
+    if (onFinish) {
+      onFinish()
+    }
   }
 }
 
+
+// 请求ai函数
 async function requestCompatibleProviderStream({
   providerLabel,
   settings,
@@ -148,6 +159,7 @@ async function requestCompatibleProviderStream({
   const endpoint = buildCompatibleEndpoint(settings.baseUrl)
   const payload = buildCompatiblePayload({ settings, systemPrompt, userPrompt })
 
+  // 发送网络请求给ai fetch
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
@@ -157,66 +169,39 @@ async function requestCompatibleProviderStream({
     body: JSON.stringify(payload)
   })
 
+  // 请求失败处理
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}))
     throw new Error(errorData.error?.message || `${providerLabel} 请求失败: HTTP ${response.status}`)
   }
 
+  // 提取 AI 返回的文字
   const parser = (data) => {
     const delta = data.choices?.[0]?.delta || {}
     return delta.content || delta.reasoning_content || ''
   }
-
+  //调用流式输出
   await processSSEStream(response, callbacks.onMessage, callbacks.onFinish, parser)
 }
 
-async function requestBaiduStream({ settings, systemPrompt, userPrompt, callbacks }) {
-  const tokenUrl = `${settings.tokenUrl}?grant_type=client_credentials&client_id=${settings.apiKey}&client_secret=${settings.secretKey}`
-  const tokenRes = await fetch(tokenUrl, { method: 'POST' })
-  const tokenData = await tokenRes.json()
-
-  if (!tokenData.access_token) {
-    throw new Error('未获取到百度 access_token，请检查 API Key / Secret Key。')
-  }
-
-  const chatUrl = `${settings.chatUrl}?access_token=${tokenData.access_token}`
-  const response = await fetch(chatUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      messages: [{ role: 'user', content: `${systemPrompt}\n\n${userPrompt}` }],
-      temperature: settings.temperature,
-      stream: true
-    })
-  })
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}))
-    throw new Error(errorData.error_msg || `百度接口请求失败: HTTP ${response.status}`)
-  }
-
-  const parser = (data) => {
-    return data.result || data.body?.result || ''
-  }
-
-  await processSSEStream(response, callbacks.onMessage, callbacks.onFinish, parser)
-}
-
-export async function generateTextStream({ 
-  task, 
-  inputText, 
-  forms, 
-  settings, 
+//执行函数，点击后最开始的执行函数
+export async function generateTextStream({
+  task,
+  inputText,
+  forms,
+  settings,
   onMessage,
   onFinish,
   onError
 }) {
   try {
+    //造提示词
     const { system, user } = buildTaskPrompts({ task, inputText, forms })
     const callbacks = { onMessage, onFinish }
 
     if (settings.provider === 'openai') {
       if (!settings.openai.apiKey.trim()) throw new Error('请先填写 OpenAI API Key。')
+      // 调用请求
       await requestCompatibleProviderStream({
         providerLabel: 'OpenAI',
         settings: settings.openai,
@@ -224,21 +209,12 @@ export async function generateTextStream({
         userPrompt: user,
         callbacks
       })
-    } else if (settings.provider === 'deepseek') {
+    } else {
       if (!settings.deepseek.apiKey.trim()) throw new Error('请先填写 DeepSeek API Key。')
+      // 调用请求
       await requestCompatibleProviderStream({
         providerLabel: 'DeepSeek',
         settings: settings.deepseek,
-        systemPrompt: system,
-        userPrompt: user,
-        callbacks
-      })
-    } else {
-      if (!settings.baidu.apiKey.trim() || !settings.baidu.secretKey.trim()) {
-        throw new Error('请先填写百度 API Key 与 Secret Key。')
-      }
-      await requestBaiduStream({
-        settings: settings.baidu,
         systemPrompt: system,
         userPrompt: user,
         callbacks
@@ -249,7 +225,7 @@ export async function generateTextStream({
     if (onError) onError(error.message || '请求失败，请稍后重试。')
   }
 }
-// ================= 以下追加到 ai.js 文件的最底部 =================
+
 
 // 不同接口的报错字段不统一，这里做一次归一化。
 // 兼容之前的 axios 错误格式，也兼容现在 fetch 抛出的原生 Error。
@@ -258,7 +234,6 @@ export function formatRequestError(error) {
   const axiosMessage =
     error.response?.data?.error?.message ||
     error.response?.data?.error?.type ||
-    error.response?.data?.error_description ||
     error.response?.data?.msg ||
     error.response?.data?.message
 

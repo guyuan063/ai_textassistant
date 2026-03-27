@@ -70,10 +70,6 @@ export const useAssistantStore = defineStore('assistant', {
         deepseek: {
           ...this.settings.deepseek,
           ...(persisted.settings?.deepseek || {})
-        },
-        baidu: {
-          ...this.settings.baidu,
-          ...(persisted.settings?.baidu || {})
         }
       }
 

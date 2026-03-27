@@ -10,8 +10,7 @@ export const TASK_TABS = [
 // 右侧模型下拉框的候选项。
 export const PROVIDER_OPTIONS = [
   { label: 'OpenAI', value: 'openai' },
-  { label: 'DeepSeek', value: 'deepseek' },
-  { label: '百度千帆 / 文心', value: 'baidu' }
+  { label: 'DeepSeek', value: 'deepseek' }
 ]
 
 // 翻译模块使用的语言选项。
@@ -61,14 +60,6 @@ export function createDefaultSettings() {
       apiKey: '',
       baseUrl: 'https://api.deepseek.com',
       model: 'deepseek-chat',
-      temperature: 0.7
-    },
-    baidu: {
-      apiKey: '',
-      secretKey: '',
-      tokenUrl: 'https://aip.baidubce.com/oauth/2.0/token',
-      chatUrl: 'https://qianfan.baidubce.com/v2/chat/completions',
-      model: 'ERNIE-Speed-128K',
       temperature: 0.7
     }
   }

@@ -2,15 +2,16 @@
   <section class="panel">
     <!-- 💡 体验优化：生成过程中禁用标签页切换 -->
     <el-tabs v-model="store.activeTask" class="task-tabs" :before-leave="() => !store.loading">
-      <el-tab-pane v-for="item in TASK_TABS" :key="item.key" :label="item.label" :name="item.key" :disabled="store.loading">
+      <el-tab-pane v-for="item in TASK_TABS" :key="item.key" :label="item.label" :name="item.key"
+        :disabled="store.loading">
         <!-- 润色模块 -->
         <template v-if="item.key === 'polish'">
           <div class="control-grid">
             <div class="control-item">
               <span>处理方式</span>
               <el-radio-group v-model="store.forms.polish.action" :disabled="store.loading">
-                <el-radio-button label="polish">润色优化</el-radio-button>
-                <el-radio-button label="correct">纠错改错</el-radio-button>
+                <el-radio-button :value="'polish'">润色优化</el-radio-button>
+                <el-radio-button :value="'correct'">纠错改错</el-radio-button>
               </el-radio-group>
             </div>
             <div class="control-item">
@@ -33,7 +34,8 @@
             <div class="control-item">
               <span>目标语言</span>
               <el-select v-model="store.forms.translate.targetLanguage" :disabled="store.loading">
-                <el-option v-for="language in targetLanguageOptions" :key="language" :label="language" :value="language" />
+                <el-option v-for="language in targetLanguageOptions" :key="language" :label="language"
+                  :value="language" />
               </el-select>
             </div>
           </div>
@@ -79,7 +81,8 @@
               <el-input v-model="store.forms.copywriting.tone" :disabled="store.loading" />
             </div>
           </div>
-          <el-input v-model="store.forms.copywriting.extra" placeholder="例如：控制在 80 字以内、适合短视频口播、不要太夸张" :disabled="store.loading" />
+          <el-input v-model="store.forms.copywriting.extra" placeholder="例如：控制在 80 字以内、适合短视频口播、不要太夸张"
+            :disabled="store.loading" />
         </template>
       </el-tab-pane>
     </el-tabs>
@@ -95,13 +98,7 @@
     </div>
 
     <div class="submit-row">
-      <el-button 
-        class="generate-btn" 
-        size="large" 
-        type="primary" 
-        :disabled="store.loading"
-        @click="$emit('generate')"
-      >
+      <el-button class="generate-btn" size="large" type="primary" :disabled="store.loading" @click="$emit('generate')">
         立即生成
       </el-button>
 
@@ -137,6 +134,5 @@ const targetLanguageOptions = computed(() =>
 </script>
 
 <style scoped>
-/* 保持你原有的 style 不变 */
-/* ... */
+
 </style>

@@ -7,8 +7,8 @@
         <!-- 润色模块 -->
         <template v-if="item.key === 'polish'">
           <div class="control-grid">
-            <div class="control-item">
-              <span>处理方式</span>
+            <div class="control-item1">
+              <span class="control-label">处理方式</span>
               <el-radio-group v-model="store.forms.polish.action" :disabled="store.loading">
                 <el-radio-button :value="'polish'">润色优化</el-radio-button>
                 <el-radio-button :value="'correct'">纠错改错</el-radio-button>
@@ -19,6 +19,7 @@
               <el-input v-model="store.forms.polish.tone" :disabled="store.loading" />
             </div>
           </div>
+          <span>其他要求</span>
           <el-input v-model="store.forms.polish.extra" placeholder="可补充要求，例如：更适合发给客户、保持简洁" :disabled="store.loading" />
         </template>
 
@@ -39,6 +40,7 @@
               </el-select>
             </div>
           </div>
+          <span>翻译要求</span>
           <el-input v-model="store.forms.translate.style" placeholder="例如：商务正式、口语自然、适合邮件" :disabled="store.loading" />
         </template>
 
@@ -58,6 +60,7 @@
               </el-select>
             </div>
           </div>
+          <span>摘要要求</span>
           <el-input v-model="store.forms.summary.focus" placeholder="例如：提炼结论、保留行动项、适合汇报" :disabled="store.loading" />
         </template>
 
@@ -81,6 +84,7 @@
               <el-input v-model="store.forms.copywriting.tone" :disabled="store.loading" />
             </div>
           </div>
+          <span>其他要求</span>
           <el-input v-model="store.forms.copywriting.extra" placeholder="例如：控制在 80 字以内、适合短视频口播、不要太夸张"
             :disabled="store.loading" />
         </template>
@@ -134,5 +138,14 @@ const targetLanguageOptions = computed(() =>
 </script>
 
 <style scoped>
+.control-label {
+  margin: 0 8px 0px 0;
+}
+
+.control-item1{
+  display: flex;
+  align-items: center;
+  margin: 0 0 8px 0;
+}
 
 </style>

@@ -1,4 +1,5 @@
 <template>
+   
   <!-- 页面最外层容器，负责限制内容宽度并承载整体布局 -->
   <div class="page-shell">
 
@@ -46,6 +47,7 @@ store.$subscribe(
   display: flex;
   gap: 20px;
   margin-top: 20px;
+  justify-content: center;
 }
 
 .nav-item {

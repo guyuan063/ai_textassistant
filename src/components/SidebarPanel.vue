@@ -1,5 +1,6 @@
 <template>
   <section class="panel side-panel">
+    <div class="panel-content">
     <div class="panel-head">
       <h2>模型配置</h2>
     </div>
@@ -62,6 +63,7 @@
         </div>
       </template>
     </div>
+</div>
   </section>
 </template>
 <script setup>
@@ -73,6 +75,10 @@ const store = useAssistantStore()
 </script>
 
 <style scoped>
+.panel-content {
+  padding: 24px;
+  width: 600px;
+}
 .panel-head {
   margin-bottom: 16px;
 }

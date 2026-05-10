@@ -63,6 +63,7 @@ select {
 
 .hero-panel {
   margin-bottom: 24px;
+  text-align: center;
 }
 
 /* 首页大标题 */
@@ -78,29 +79,40 @@ select {
   color: var(--muted);
   font-size: 1rem;
   line-height: 1.8;
-  margin: 0;
+  margin: 0 auto;
   max-width: 760px;
 }
 
-/* 主内容区使用两列布局：左宽右窄 */
+/* 主内容区居中显示 */
 .dashboard {
-  display: grid;
+  display: flex;
+  justify-content: center;
   gap: 24px;
-  grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.9fr);
 }
 
-.main-column,
+.main-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 900px;
+  width: 100%;
+}
+
 .side-column {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-/* 平板及以下改成单列布局 */
+/* 平板及以下调整布局 */
 @media (max-width: 1120px) {
-  .hero-panel,
   .dashboard {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .main-column {
+    max-width: 100%;
   }
 }
 

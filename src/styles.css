@@ -1,36 +1,98 @@
-/* 全局字体：标题使用衬线，正文使用无衬线 */
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@600;700&display=swap');
+/* ── Design System: Warm Editorial ── */
 
-/* 全局设计变量，后续改主题色时主要改这里 */
 :root {
-  --bg: #ffffff;
-  --ink: #1b263b;
-  --muted: #6b7280;
-  --accent: #409eff;
-  --accent-dark: #337ecc;
+  /* Surface */
+  --bg: #faf8f5;
+  --bg-card: #ffffff;
+  --bg-elevated: #f5f2ed;
+
+  /* Ink */
+  --ink: #2c2520;
+  --ink-secondary: #5c534b;
+  --muted: #9a8e85;
+
+  /* Accent */
+  --accent: #c0763a;
+  --accent-hover: #a8642e;
+  --accent-light: rgba(192, 118, 58, 0.08);
+  --accent-glow: rgba(192, 118, 58, 0.15);
+
+  /* Borders & Shadows */
+  --border: rgba(44, 37, 32, 0.08);
+  --border-hover: rgba(44, 37, 32, 0.15);
+  --shadow-sm: 0 1px 3px rgba(44, 37, 32, 0.04), 0 1px 2px rgba(44, 37, 32, 0.02);
+  --shadow-md: 0 4px 16px rgba(44, 37, 32, 0.06), 0 2px 4px rgba(44, 37, 32, 0.03);
+  --shadow-lg: 0 12px 40px rgba(44, 37, 32, 0.08), 0 4px 12px rgba(44, 37, 32, 0.04);
+  --shadow-accent: 0 4px 20px rgba(192, 118, 58, 0.2);
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+
+  /* Transition */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration: 0.3s;
 }
 
-/* 统一使用 border-box，避免元素尺寸计算混乱 */
-* {
+/* ── Reset ── */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-/* 让页面至少撑满一屏，并去掉浏览器默认外边距 */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 html,
 body,
 #app {
-  margin: 0;
   min-height: 100%;
 }
 
-/* 整个页面的基础字体、背景和文字颜色 */
 body {
-  background: #ffffff;
+  background: var(--bg);
   color: var(--ink);
-  font-family: 'Manrope', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-family: 'DM Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
 }
 
-/* 让表单控件和按钮继承页面字体，而不是浏览器默认字体 */
+/* Subtle noise texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+}
+
+/* Shared form label */
+.control-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink-secondary);
+  letter-spacing: 0.01em;
+}
+
+/* Panel headings */
+.panel-head h2 {
+  font-family: 'LXGW WenKai', 'Noto Serif SC', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+}
+
 button,
 input,
 textarea,
@@ -38,52 +100,93 @@ select {
   font: inherit;
 }
 
-
-/* 页面主体宽度限制 */
+/* ── Layout Shell ── */
 .page-shell {
   margin: 0 auto;
-  max-width: 1480px;
-  padding: 28px;
+  max-width: 1320px;
+  padding: 32px 28px 60px;
 }
 
-
-
-.hero-panel,
-.dashboard {
+/* ── Hero Header ── */
+.hero-panel {
   position: relative;
   z-index: 1;
-}
-
-/* 所有白色卡片的基础样式 */
-.panel {
- border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  padding: 24px;
-}
-
-.hero-panel {
-  margin-bottom: 24px;
+  margin-bottom: 28px;
+  padding: 40px 32px 32px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
   text-align: center;
+  overflow: hidden;
 }
 
-/* 首页大标题 */
+/* Warm gradient accent bar at top */
+.hero-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), #d4956a, var(--accent));
+}
+
 .hero-copy h1 {
-  font-family: 'Noto Serif SC', 'Songti SC', serif;
-  font-size: clamp(2rem, 4vw, 3.6rem);
-  line-height: 1.15;
-  margin: 10px 0 12px;
+  font-family: 'LXGW WenKai', 'Noto Serif SC', 'Songti SC', serif;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-bottom: 10px;
 }
 
-/* 首页副标题 */
 .hero-description {
   color: var(--muted);
-  font-size: 1rem;
-  line-height: 1.8;
+  font-size: 0.95rem;
+  line-height: 1.7;
   margin: 0 auto;
-  max-width: 760px;
+  max-width: 520px;
+  letter-spacing: 0.01em;
 }
 
-/* 主内容区居中显示 */
+/* ── Navigation ── */
+.nav-menu {
+  display: flex;
+  gap: 6px;
+  margin-top: 24px;
+  justify-content: center;
+}
+
+.nav-item {
+  position: relative;
+  padding: 9px 22px;
+  border-radius: 100px;
+  text-decoration: none;
+  color: var(--ink-secondary);
+  font-weight: 500;
+  font-size: 0.92rem;
+  letter-spacing: 0.01em;
+  transition: color var(--duration) var(--ease-out), background var(--duration) var(--ease-out), box-shadow var(--duration) var(--ease-out);
+}
+
+.nav-item:hover {
+  color: var(--ink);
+  background: var(--bg-elevated);
+}
+
+.nav-item.router-link-active {
+  color: #fff;
+  background: var(--accent);
+  box-shadow: var(--shadow-accent);
+}
+
+.nav-item.router-link-active:hover {
+  background: var(--accent-hover);
+}
+
+/* ── Dashboard Layout ── */
 .dashboard {
   display: flex;
   justify-content: center;
@@ -94,7 +197,7 @@ select {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  max-width: 900px;
+  max-width: 860px;
   width: 100%;
 }
 
@@ -104,25 +207,158 @@ select {
   gap: 24px;
 }
 
-/* 平板及以下调整布局 */
+/* ── Card / Panel Base ── */
+.panel {
+  position: relative;
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--duration) var(--ease-out);
+}
+
+.panel:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* ── Entrance Animation ── */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-panel {
+  animation: fadeSlideUp 0.6s var(--ease-out) both;
+}
+
+.main-column > .panel:nth-child(1) {
+  animation: fadeSlideUp 0.6s var(--ease-out) 0.1s both;
+}
+
+.main-column > .panel:nth-child(2) {
+  animation: fadeSlideUp 0.6s var(--ease-out) 0.2s both;
+}
+
+.side-column > .panel {
+  animation: fadeSlideUp 0.6s var(--ease-out) 0.15s both;
+}
+
+/* ── Element Plus Overrides ── */
+
+/* Tabs */
+.task-tabs .el-tabs__header {
+  margin-bottom: 20px;
+}
+
+.task-tabs .el-tabs__nav-wrap::after {
+  display: none;
+}
+
+.task-tabs .el-tabs__item {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--muted);
+  transition: color var(--duration) var(--ease-out);
+}
+
+.task-tabs .el-tabs__item:hover {
+  color: var(--ink-secondary);
+}
+
+.task-tabs .el-tabs__item.is-active {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.task-tabs .el-tabs__active-bar {
+  background-color: var(--accent);
+  border-radius: 2px;
+  height: 2.5px;
+}
+
+/* Inputs */
+.el-input__wrapper,
+.el-textarea__inner {
+  border-radius: var(--radius-sm) !important;
+  transition: box-shadow var(--duration) var(--ease-out), border-color var(--duration) var(--ease-out) !important;
+}
+
+.el-input__wrapper:hover,
+.el-textarea__inner:hover {
+  box-shadow: 0 0 0 1px var(--border-hover) inset !important;
+}
+
+.el-input__wrapper.is-focus,
+.el-textarea__inner:focus {
+  box-shadow: 0 0 0 1px var(--accent) inset, 0 0 0 3px var(--accent-light) !important;
+}
+
+/* Select dropdown */
+.el-select-dropdown {
+  border-radius: var(--radius-sm) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* Slider */
+.el-slider__bar {
+  background-color: var(--accent) !important;
+}
+
+.el-slider__button {
+  border-color: var(--accent) !important;
+}
+
+/* Radio buttons */
+.el-radio-button__inner {
+  transition: background-color var(--duration) var(--ease-out), border-color var(--duration) var(--ease-out), box-shadow var(--duration) var(--ease-out) !important;
+}
+
+.el-radio-button__original-radio:checked + .el-radio-button__inner {
+  background-color: var(--accent) !important;
+  border-color: var(--accent) !important;
+  box-shadow: -1px 0 0 0 var(--accent) !important;
+}
+
+/* Alert */
+.el-alert {
+  border-radius: var(--radius-sm) !important;
+}
+
+/* ── Responsive ── */
 @media (max-width: 1120px) {
   .dashboard {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .main-column {
     max-width: 100%;
   }
 }
 
-/* 手机端缩小留白，避免内容太挤 */
 @media (max-width: 720px) {
   .page-shell {
-    padding: 16px;
+    padding: 16px 14px 40px;
+  }
+
+  .hero-panel {
+    padding: 28px 20px 24px;
   }
 
   .panel {
-    padding: 18px;
+    padding: 20px;
+  }
+
+  .nav-item {
+    padding: 8px 16px;
+    font-size: 0.88rem;
   }
 }

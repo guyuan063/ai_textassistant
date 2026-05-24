@@ -1,0 +1,36 @@
+# 此工作流将在使用 node 运行测试后，在创建发布时将软件包发布到 GitHub Packages
+# 有关更多信息，请参阅：https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
+
+名称: 
+
+启用:
+发布:
+类型: [创建时间]
+
+作业:
+构建:
+运行于: ubuntu-latest
+步骤:
+      - 使用: actions/checkout@v4
+      - 使用: actions/setup-node@v4
+与:
+: 20
+      - 运行: npm 安装
+      - 运行: npm 测试
+
+  publish-gpr:
+    needs: build
+: ubuntu-latest
+权限:
+      contents: read
+: 写
+ 步骤:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+节点版本: 20
+          registry-url: https://npm.pkg.github.com/
+      - 运行: npm 安装
+      - 运行: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

@@ -78,8 +78,6 @@ export const useAssistantStore = defineStore('assistant', {
       // 读取本地缓存的状态
       const persisted = loadPersistedState()
 
-      // 调试输出：观察恢复的数据结构
-      console.log(persisted)
 
       // 如果没有缓存数据，直接返回
       if (!persisted) {

@@ -3,6 +3,9 @@
     <div class="panel-head">
       <h2>AI 输出内容</h2>
       <div class="panel-actions">
+        <el-button class="copy-btn" :disabled="store.loading || !store.resultText" @click="handleCopy">
+          {{ copied ? '已复制' : '复制结果' }}
+        </el-button>
         <el-button class="regenerate-btn" :disabled="store.loading" @click="$emit('regenerate')">
           重新生成
         </el-button>
@@ -40,10 +43,16 @@
 
 <script setup>
 import { useAssistantStore } from '@/stores/assistant'
+import { useClipboard } from '@/composables/useClipboard'
 
 defineEmits(['regenerate'])
 
 const store = useAssistantStore()
+const { copied, copy } = useClipboard()
+
+function handleCopy() {
+  copy(store.resultText)
+}
 </script>
 
 <style scoped>
@@ -57,6 +66,20 @@ const store = useAssistantStore()
 .panel-actions {
   display: flex;
   gap: 8px;
+}
+
+.copy-btn {
+  border-radius: 100px !important;
+  font-size: 0.88rem;
+  color: var(--accent) !important;
+  border-color: var(--accent) !important;
+  background: var(--accent-light) !important;
+  transition: color var(--duration) var(--ease-out), border-color var(--duration) var(--ease-out), background var(--duration) var(--ease-out) !important;
+}
+
+.copy-btn:hover:not(:disabled) {
+  background: var(--accent) !important;
+  color: white !important;
 }
 
 .regenerate-btn {
